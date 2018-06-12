@@ -7,7 +7,9 @@ set(MODULES_COMPILE_OPTION -fmodules-ts)
 #   add_module_executable(<name> [sources...] MODULES [modules...]
 function(add_module_executable)
   cmake_parse_arguments(AME "" "" "MODULES" ${ARGN})
-  set(compile_options ${MODULES_COMPILE_OPTION})
+  set(compile_options ${MODULES_COMPILE_OPTION}
+      # Clang incorrectly warns abut -fprebuilt-module-path being unused.
+      -fprebuilt-module-path=. -Wno-unused-command-line-argument)
   set(pcms)
   foreach (mod ${AME_MODULES})
     get_filename_component(pcm ${mod} NAME_WE)
@@ -66,6 +68,4 @@ endfunction()
 
 add_module_library(test MODULES test.cc)
 add_module_executable(main main.cc)
-target_compile_options(main
-  PRIVATE -fprebuilt-module-path=. -Wno-unused-command-line-argument)
 target_link_libraries(main test)
