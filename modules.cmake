@@ -23,7 +23,7 @@ function(add_module_library name)
   # Check if modules are supported.
   set(have_modules FALSE)
   if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND
-      CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 16.0)
+      CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 15.0)
     set(have_modules TRUE)
   endif ()
   if (NOT have_modules)
