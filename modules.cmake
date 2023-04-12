@@ -84,6 +84,6 @@ function(add_module_library)
   endforeach ()
   target_sources(${name} PUBLIC ${files})
 
-  target_link_libraries(${name} ${pcms})
+  #target_link_libraries(${name} ${pcms})
   target_compile_options(${name} PRIVATE ${compile_options})
 endfunction()
