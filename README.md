@@ -2,6 +2,8 @@
 
 Provides the `add_module_library` CMake function that is a wrapper around `add_library` with additional rules to generate `.pcm` files. Currently supports clang 16+ and can fallback to non-modular library for compatibility.
 
+## Usage
+
 `hello.cc`:
 ```c++
 export module hello;
