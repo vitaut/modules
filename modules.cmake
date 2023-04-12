@@ -20,6 +20,16 @@ function(add_module_library name)
     return()
   endif ()
 
+  # Check if modules are supported.
+  set(have_modules FALSE)
+  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND
+      CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 16.0)
+    set(have_modules TRUE)
+  endif ()
+  if (NOT have_modules)
+    message(FATAL_ERROR "Modules not supported.")
+  endif ()
+
   # Modules require C++20.
   target_compile_features(${name} PUBLIC cxx_std_20)
 
