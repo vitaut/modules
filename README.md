@@ -41,7 +41,7 @@ target_link_libraries(main hello)
 Building with clang 16:
 
 ```
-CXX=clang++-16 cmake .
+CXX=clang++ cmake .
 make
 ```
 
