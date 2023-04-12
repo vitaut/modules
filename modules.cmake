@@ -9,7 +9,6 @@ option(USE_MODULES "Use C++ modules" OFF)
 #   add_pcm_build_commands(<target> <pcms_var> <compile_options_var> <module>...)
 function(add_pcm_build_commands target pcms_var compile_options_var)
   get_target_property(std ${target} CXX_STANDARD)
-
   set(pcms)
   foreach (mod ${ARGN})
     get_filename_component(pcm ${mod} NAME_WE)
@@ -43,14 +42,10 @@ function(add_module_executable)
 
   # Get the target name.
   list(GET AME_UNPARSED_ARGUMENTS 0 name)
-  add_executable(${AME_UNPARSED_ARGUMENTS})
 
-  # Get the target name.
-  list(GET AME_UNPARSED_ARGUMENTS 0 name)
-  add_pcm_build_commands(${name} pcms compile_options ${AME_MODULES})
-  # Add pcm files as sources to make sure they are built before the executable.
-  target_sources(${name} PUBLIC ${pcms})
-  target_link_libraries(${name} ${pcms})
+  add_executable(${AME_UNPARSED_ARGUMENTS})
+  set_target_properties(${name} PROPERTIES CXX_EXTENSIONS OFF)
+
   target_compile_options(${name} PRIVATE ${compile_options}
       # Clang incorrectly warns about -fprebuilt-module-path being unused.
       -fprebuilt-module-path=. -Wno-unused-command-line-argument)
