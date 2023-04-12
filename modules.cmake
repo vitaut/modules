@@ -10,7 +10,7 @@
 function(add_module_library name)
   cmake_parse_arguments(AML "" "IF" "FALLBACK" ${ARGN})
   set(sources ${AML_UNPARSED_ARGUMENTS})
-  
+
   add_library(${name})
   set_target_properties(${name} PROPERTIES LINKER_LANGUAGE CXX)
 
