@@ -1,5 +1,3 @@
-import test;
+import hello;
 
-int main() {
-  f();
-}
+int main() { hello(); }

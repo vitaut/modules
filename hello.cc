@@ -1,4 +1,4 @@
-export module test;
+export module hello;
 
 #include "hello.h"
 #include <cstdio>
