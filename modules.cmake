@@ -16,7 +16,7 @@ function(add_module_library name)
 
   if (NOT ${${AML_IF}})
     # Create a non-modular library.
-    target_sources(${name} PUBLIC ${AML_FALLBACK})
+    target_sources(${name} PRIVATE ${AML_FALLBACK})
     return()
   endif ()
 
@@ -57,8 +57,18 @@ function(add_module_library name)
       DEPENDS ${src})
   endforeach ()
 
-  # Add .pcm files as sources to compile them to .o files.
-  target_sources(${name} PUBLIC ${pcms})
-  target_compile_options(${name} PUBLIC -Wno-unused-command-line-argument)
-  set_source_files_properties(${pcms} PROPERTIES LANGUAGE CXX)
+    # Add .pcm files as sources to make sure they are built before the library.
+    set(files)
+    foreach (pcm ${pcms})
+      get_filename_component(pcm_we ${pcm} NAME_WE)
+      set(obj ${pcm_we}.o)
+      # Use an absolute path to prevent target_link_libraries prepending -l.
+      set(files ${files} ${pcm} ${CMAKE_CURRENT_BINARY_DIR}/${obj})
+      add_custom_command(
+        OUTPUT ${obj}
+        COMMAND ${CMAKE_CXX_COMPILER} $<TARGET_PROPERTY:${name},COMPILE_OPTIONS>
+                -c -o ${obj} ${pcm}
+        DEPENDS ${pcm})
+    endforeach ()
+    target_sources(${name} PRIVATE ${files})  
 endfunction()
