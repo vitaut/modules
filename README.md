@@ -1,6 +1,6 @@
 # Simple C++20 module support for CMake
 
-Provides the `add_module_library` CMake function that is a wrapper around `add_library` with additional rules to generate `.pcm` files. Currently supports clang 15+ and can fallback to a non-modular library for compatibility.
+Provides the `add_module_library` CMake function that is a wrapper around `add_library` with additional rules to generate `.pcm` files. Currently supports clang 15+ and gcc 12+ and can fallback to a non-modular library for compatibility.
 
 ## Usage
 
