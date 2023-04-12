@@ -38,7 +38,7 @@ add_executable(main main.cc)
 target_link_libraries(main hello)
 ```
 
-Building with clang 16:
+Building with clang:
 
 ```
 CXX=clang++ cmake .
