@@ -6,9 +6,11 @@ Provides the `add_module_library` CMake function that is a wrapper around `add_l
 
 `hello.cc`:
 ```c++
-export module hello;
+module;
 
 #include <cstdio>
+
+export module hello;
 
 export void hello() { std::printf("Hello, modules!\n"); }
 ```
