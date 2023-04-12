@@ -27,21 +27,24 @@ function(add_module_library name)
   get_target_property(std ${name} CXX_STANDARD)
 
   set(pcms)
-  foreach (mod ${sources})
-    get_filename_component(pcm ${mod} NAME_WE)
+  foreach (src ${sources})
+    get_filename_component(pcm ${src} NAME_WE)
     set(pcm ${pcm}.pcm)
-    set(compile_options ${compile_options} -fmodule-file=${pcm})
+
+    # Propagate -fmodule-file=* to targets that link with this library.
+    target_compile_options(${name} PUBLIC -fmodule-file=${pcm})
+
     # Use an absolute path to prevent target_link_libraries prepending -l to it.
     set(pcms ${pcms} ${CMAKE_CURRENT_BINARY_DIR}/${pcm})
     add_custom_command(
       OUTPUT ${pcm}
       COMMAND ${CMAKE_CXX_COMPILER}
               -std=c++${std} -x c++-module --precompile -c
-              -o ${pcm} ${CMAKE_CURRENT_SOURCE_DIR}/${mod}
+              -o ${pcm} ${CMAKE_CURRENT_SOURCE_DIR}/${src}
               "-I$<JOIN:$<TARGET_PROPERTY:${name},INCLUDE_DIRECTORIES>,;-I>"
       # Required by the -I generator expression above.
       COMMAND_EXPAND_LISTS
-      DEPENDS ${mod})
+      DEPENDS ${src})
   endforeach ()
 
   # Add pcm files as sources to make sure they are built before the library.
@@ -57,8 +60,4 @@ function(add_module_library name)
       DEPENDS ${pcm})
   endforeach ()
   target_sources(${name} PUBLIC ${files})
-
-  #target_link_libraries(${name} ${pcms})
-  # Propagate -fmodule-file=* to targets that link with this library.
-  target_compile_options(${name} PUBLIC ${compile_options})
 endfunction()
