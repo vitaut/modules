@@ -4,10 +4,9 @@ project(HELLO)
 # Clang 16 requires extensions to be disabled for modules.
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(USE_MODULES ON)
-include(${CMAKE_SOURCE_DIR}/modules.cmake)
+include(modules.cmake)
 
-add_module_library(hello MODULES hello.cc)
+add_module_library(hello MODULES hello.cc IF USE_MODULES)
 target_include_directories(hello PRIVATE include)
 
 add_executable(main main.cc)

@@ -1,13 +1,12 @@
 # A CMake module that provides functions for using C++20 modules in Clang.
 
-option(USE_MODULES "Use C++ modules" OFF)
-
 # Adds a library compiled with C++20 module support.
+# `enabled` is a CMake variables that specifies if modules are enabled.
 # Usage:
-#   add_module_library(<name> [sources...] MODULES [modules...]
+#   add_module_library(<name> [sources...] MODULES [modules...] [IF enabled])
 function(add_module_library)
-  cmake_parse_arguments(AML "" "" "MODULES" ${ARGN})
-  if (NOT USE_MODULES)
+  cmake_parse_arguments(AML "" "IF" "MODULES" ${ARGN})
+  if (NOT ${${AML_IF}})
     add_library(${AML_UNPARSED_ARGUMENTS})
     return()
   endif ()
