@@ -1,7 +1,6 @@
 # A CMake module that provides functions for using C++ modules in Clang.
 
 option(USE_MODULES "Use C++ modules" OFF)
-set(MODULES_COMPILE_OPTION -fmodules-ts)
 
 # Adds a custom command for building .pcm files from module files <module>...
 # using <target>'s include directories. The list of .pcm files is returned in the
@@ -10,7 +9,6 @@ set(MODULES_COMPILE_OPTION -fmodules-ts)
 #   add_pcm_build_commands(<target> <pcms_var> <compile_options_var> <module>...)
 function(add_pcm_build_commands target pcms_var compile_options_var)
   set(pcms)
-  set(compile_options ${MODULES_COMPILE_OPTION})
   foreach (mod ${ARGN})
     get_filename_component(pcm ${mod} NAME_WE)
     set(pcm ${pcm}.pcm)
@@ -77,5 +75,6 @@ function(add_module_library)
   add_library(${AME_UNPARSED_ARGUMENTS} ${files})
   set_target_properties(${name} PROPERTIES LINKER_LANGUAGE CXX)
   target_link_libraries(${name} ${pcms})
+  target_compile_features(${name} PUBLIC cxx_std_20)
   target_compile_options(${name} PRIVATE ${compile_options})
 endfunction()
