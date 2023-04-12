@@ -6,9 +6,9 @@
 # non-modular library.
 #
 # Usage:
-#   add_module_library(<name> [sources...] MODULES [modules...] [IF enabled])
+#   add_module_library(<name> [sources...] FALLBACK [sources...] [IF enabled])
 function(add_module_library name)
-  cmake_parse_arguments(AML "" "IF" "MODULES" ${ARGN})
+  cmake_parse_arguments(AML "" "IF" "FALLBACK" ${ARGN})
   set(sources ${AML_UNPARSED_ARGUMENTS})
   
   add_library(${name})
@@ -16,7 +16,7 @@ function(add_module_library name)
 
   if (NOT ${${AML_IF}})
     # Create a non-modular library.
-    target_sources(${name} PUBLIC ${sources})
+    target_sources(${name} PUBLIC ${AML_FALLBACK})
     return()
   endif ()
 
@@ -27,7 +27,7 @@ function(add_module_library name)
   get_target_property(std ${name} CXX_STANDARD)
 
   set(pcms)
-  foreach (mod ${AML_MODULES})
+  foreach (mod ${sources})
     get_filename_component(pcm ${mod} NAME_WE)
     set(pcm ${pcm}.pcm)
     set(compile_options ${compile_options} -fmodule-file=${pcm})

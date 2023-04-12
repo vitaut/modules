@@ -6,7 +6,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(modules.cmake)
 
-add_module_library(hello MODULES hello.cc IF USE_MODULES)
+add_module_library(hello hello.cc)
 target_include_directories(hello PRIVATE include)
 
 add_executable(main main.cc)
