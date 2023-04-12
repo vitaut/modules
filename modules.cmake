@@ -2,21 +2,28 @@
 
 # Adds a library compiled with C++20 module support.
 # `enabled` is a CMake variables that specifies if modules are enabled.
+# If modules are disabled `add_module_library` falls back to creating a
+# non-modular library.
+#
 # Usage:
 #   add_module_library(<name> [sources...] MODULES [modules...] [IF enabled])
-function(add_module_library)
+function(add_module_library name)
   cmake_parse_arguments(AML "" "IF" "MODULES" ${ARGN})
+  set(sources ${AML_UNPARSED_ARGUMENTS})
+  
+  add_library(${name})
+  set_target_properties(${name} PROPERTIES LINKER_LANGUAGE CXX)
+
   if (NOT ${${AML_IF}})
-    add_library(${AML_UNPARSED_ARGUMENTS})
+    # Create a non-modular library.
+    target_sources(${name} PUBLIC ${sources})
     return()
   endif ()
 
-  # Get the target name.
-  list(GET AML_UNPARSED_ARGUMENTS 0 name)
-
-  add_library(${AML_UNPARSED_ARGUMENTS})
-  set_target_properties(${name} PROPERTIES LINKER_LANGUAGE CXX)
+  # Modules require C++20.
   target_compile_features(${name} PUBLIC cxx_std_20)
+
+  # `std` is affected by CMake options and may be higher than C++20.
   get_target_property(std ${name} CXX_STANDARD)
 
   set(pcms)
