@@ -30,27 +30,6 @@ function(add_pcm_build_commands target pcms_var compile_options_var)
   set(${compile_options_var} ${compile_options} PARENT_SCOPE)
 endfunction()
 
-# Adds an executable compiled with C++ module support.
-# Usage:
-#   add_module_executable(<name> [sources...] MODULES [modules...]
-function(add_module_executable)
-  cmake_parse_arguments(AME "" "" "MODULES" ${ARGN})
-  if (NOT USE_MODULES)
-    add_executable(${AME_UNPARSED_ARGUMENTS})
-    return()
-  endif ()
-
-  # Get the target name.
-  list(GET AME_UNPARSED_ARGUMENTS 0 name)
-
-  add_executable(${AME_UNPARSED_ARGUMENTS})
-  set_target_properties(${name} PROPERTIES CXX_EXTENSIONS OFF)
-
-  target_compile_options(${name} PRIVATE ${compile_options}
-      # Clang incorrectly warns about -fprebuilt-module-path being unused.
-      -fprebuilt-module-path=. -Wno-unused-command-line-argument)
-endfunction()
-
 # Adds a library compiled with C++ module support.
 # Usage:
 #   add_module_library(<name> [sources...] MODULES [modules...]
@@ -85,5 +64,6 @@ function(add_module_library)
   target_sources(${name} PUBLIC ${files})
 
   #target_link_libraries(${name} ${pcms})
-  target_compile_options(${name} PRIVATE ${compile_options})
+  # Propagate -fmodule-file=* to targets that link with this library.
+  target_compile_options(${name} PUBLIC ${compile_options})
 endfunction()
