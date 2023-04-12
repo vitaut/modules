@@ -57,18 +57,18 @@ function(add_module_library name)
       DEPENDS ${src})
   endforeach ()
 
-    # Add .pcm files as sources to make sure they are built before the library.
-    set(files)
-    foreach (pcm ${pcms})
-      get_filename_component(pcm_we ${pcm} NAME_WE)
-      set(obj ${pcm_we}.o)
-      # Use an absolute path to prevent target_link_libraries prepending -l.
-      set(files ${files} ${pcm} ${CMAKE_CURRENT_BINARY_DIR}/${obj})
-      add_custom_command(
-        OUTPUT ${obj}
-        COMMAND ${CMAKE_CXX_COMPILER} $<TARGET_PROPERTY:${name},COMPILE_OPTIONS>
-                -c -o ${obj} ${pcm}
-        DEPENDS ${pcm})
-    endforeach ()
-    target_sources(${name} PRIVATE ${files})  
+  # Add .pcm files as sources to make sure they are built before the library.
+  set(files)
+  foreach (pcm ${pcms})
+    get_filename_component(pcm_we ${pcm} NAME_WE)
+    set(obj ${pcm_we}.o)
+    # Use an absolute path to prevent target_link_libraries prepending -l.
+    set(files ${files} ${pcm} ${CMAKE_CURRENT_BINARY_DIR}/${obj})
+    add_custom_command(
+      OUTPUT ${obj}
+      COMMAND ${CMAKE_CXX_COMPILER} $<TARGET_PROPERTY:${name},COMPILE_OPTIONS>
+              -c -o ${obj} ${pcm}
+      DEPENDS ${pcm})
+  endforeach ()
+  target_sources(${name} PRIVATE ${files})  
 endfunction()
