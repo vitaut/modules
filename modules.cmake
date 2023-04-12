@@ -18,6 +18,7 @@ function(add_module_library)
   add_library(${AML_UNPARSED_ARGUMENTS})
   set_target_properties(${name} PROPERTIES LINKER_LANGUAGE CXX)
   target_compile_features(${name} PUBLIC cxx_std_20)
+  get_target_property(std ${name} CXX_STANDARD)
 
   set(pcms)
   foreach (mod ${AML_MODULES})
