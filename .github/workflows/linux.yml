@@ -1,0 +1,41 @@
+name: linux
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        # https://github.com/actions/virtual-environments.
+        os: [ubuntu-22.04]
+        compiler: ["g++-12", "clang++-14"]
+        standard: [17, 20, 23]
+        build_type: [Debug]
+        include:
+          - cxx: g++-12
+            install: sudo apt install g++-12
+          - cxx: clang++-14
+            install: sudo apt install clang-14
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Create Build Environment
+      run: |
+        sudo apt update
+        ${{matrix.install}}
+        cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Configure
+      working-directory: ${{runner.workspace}}/build
+      env:
+        CXX: ${{matrix.cxx}}
+      run: cmake -DCMAKE_CXX_STANDARD=${{matrix.standard}} -DCMAKE_BUILD_TYPE=${{matrix.build_type}} ${GITHUB_WORKSPACE}/example
+
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      run: cmake --build . --config ${{matrix.build_type}} --parallel

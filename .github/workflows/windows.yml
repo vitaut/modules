@@ -1,0 +1,32 @@
+name: windows
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        # https://github.com/actions/virtual-environments.
+        os: [windows-2022]
+        platform: [x64]
+        toolset: [v142]
+        standard: [17, 20, 23]
+        build_type: [Debug]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Configure
+      working-directory: ${{runner.workspace}}/build
+      run: cmake -A ${{matrix.platform}} -T ${{matrix.toolset}} -DCMAKE_CXX_STANDARD=${{matrix.standard}} -DCMAKE_BUILD_TYPE=${{matrix.build_type}} ${env:GITHUB_WORKSPACE}/example
+
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      run: cmake --build . --config ${{matrix.build_type}} --parallel
