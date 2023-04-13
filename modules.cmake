@@ -2,7 +2,7 @@
 
 # Clang 16 requires extensions to be disabled for modules.
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  set(CMAKE_CXX_EXTENSIONS OFF PARENT_SCOPE)
+  set(CMAKE_CXX_EXTENSIONS OFF)
 endif ()
 
 # Adds a library compiled with C++20 module support.
