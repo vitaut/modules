@@ -1,7 +1,9 @@
 # A CMake module that provides functions for using C++20 modules in Clang.
 
 # Clang 16 requires extensions to be disabled for modules.
-set(CMAKE_CXX_EXTENSIONS OFF PARENT_SCOPE)
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  set(CMAKE_CXX_EXTENSIONS OFF PARENT_SCOPE)
+endif ()
 
 # Adds a library compiled with C++20 module support.
 # `enabled` is a CMake variables that specifies if modules are enabled.
