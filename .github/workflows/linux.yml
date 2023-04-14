@@ -1,0 +1,51 @@
+name: linux
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        # https://github.com/actions/virtual-environments.
+        os: [ubuntu-22.04]
+        compiler: ["g++-12", "g++-13", "clang++-14", "clang++-15", "clang++-16"]
+        standard: [20]
+        build_type: [Debug]
+        include:
+          - cxx: g++-12
+            install: sudo apt install g++-12
+          - cxx: g++-13
+            install: sudo apt install g++-13
+          - cxx: clang++-14
+            install: sudo apt install clang-14
+          - cxx: clang++-15
+            source: "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"
+            install: sudo apt install clang-15
+          - cxx: clang++-16
+            source: "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-16 main"
+            install: sudo apt install clang-16
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Create Build Environment
+      run: |
+        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 15CF4D18AF4F7421 #LLVM repo key
+        echo '${{matrix.source}}' | sudo tee /etc/apt/sources.list.d/github.list
+        sudo apt update
+        ${{matrix.install}}
+        cmake -E make_directory ${{runner.workspace}}/build
+
+    - name: Configure
+      working-directory: ${{runner.workspace}}/build
+      env:
+        CXX: ${{matrix.cxx}}
+      run: cmake -DCMAKE_CXX_STANDARD=${{matrix.standard}} -DCMAKE_BUILD_TYPE=${{matrix.build_type}} ${GITHUB_WORKSPACE}
+
+    - name: Build
+      working-directory: ${{runner.workspace}}/build
+      run: cmake --build . --config ${{matrix.build_type}} --parallel
