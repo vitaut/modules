@@ -1,0 +1,15 @@
+.vscode/
+.vs/
+.idea/
+
+build/
+~build/
+bin/
+
+CMakeFiles/
+CMakeScripts/
+
+*~
+*.a
+*.so*
+*.xcodeproj
