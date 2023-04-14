@@ -42,7 +42,7 @@ function(add_module_library name)
 
       # Propagate -fmodule-file=*.pcm to targets that link with this library.
       target_compile_options(
-        ${name} PUBLIC -fmodule-file=${CMAKE_CURRENT_BINARY_DIR}/${pcm}
+        ${name} PUBLIC -fmodule-file=${CMAKE_CURRENT_BINARY_DIR}/${pcm})
 
       # Use an absolute path to prevent target_link_libraries prepending -l
       # to it.
