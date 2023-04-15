@@ -31,10 +31,14 @@ function(add_module_library name)
     target_compile_options(${name} PUBLIC -fmodules-ts)
   endif ()
 
-  # `std` is affected by CMake options and may be higher than C++20.
-  get_target_property(std ${name} CXX_STANDARD)
-
   if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    # `std` is affected by CMake options and may be higher than C++20.
+    # Clang does not support c++23/c++26 names, so replace it with 2b
+    get_target_property(std ${name} CXX_STANDARD)
+    if(std GREATER 20)
+        set(std 2b)
+    endif()
+
     set(pcms)
     foreach (src ${sources})
       get_filename_component(pcm ${src} NAME_WE)

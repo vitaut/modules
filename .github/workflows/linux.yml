@@ -13,7 +13,7 @@ jobs:
         # https://github.com/actions/virtual-environments.
         os: [ubuntu-22.04]
         compiler: ["g++-12", "g++-13", "clang++-14", "clang++-15", "clang++-16"]
-        standard: [20]
+        standard: [20, 23]
         build_type: [Debug]
         include:
           - cxx: g++-12
