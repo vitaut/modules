@@ -30,10 +30,17 @@
   without including the above copyright and permission notices.
 ]]
 
-# Clang 16 requires extensions to be disabled for modules.
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  set(CMAKE_CXX_EXTENSIONS OFF)
-endif ()
+
+# Clang requires to set CXX_EXTENSIONS property to false
+# Disable them if the user has not set them explicitly, otherwise warn about it
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  if(NOT DEFINED CMAKE_CXX_EXTENSIONS)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+  elseif(NOT CMAKE_CXX_EXTENSIONS)
+    message(WARNING "Clang requires CMAKE_CXX_EXTENSIONS to be set to false to use modules.")
+  endif()
+endif()
+
 
 # Adds a library compiled with C++20 module support.
 # `enabled` is a CMake variables that specifies if modules are enabled.
