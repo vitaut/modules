@@ -31,15 +31,16 @@
 ]]
 
 
-# Clang requires to set CXX_EXTENSIONS property to false
-# Disable them if the user has not set them explicitly, otherwise warn about it
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  if(NOT DEFINED CMAKE_CXX_EXTENSIONS)
+# Clang requires the CXX_EXTENSIONS property to be set to false to use modules.
+# If the user has not set it explicitly, do it here. Otherwise warn if it is not
+# set to false.
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  if (NOT DEFINED CMAKE_CXX_EXTENSIONS)
     set(CMAKE_CXX_EXTENSIONS OFF)
-  elseif(NOT CMAKE_CXX_EXTENSIONS)
+  elseif (NOT CMAKE_CXX_EXTENSIONS)
     message(WARNING "Clang requires CMAKE_CXX_EXTENSIONS to be set to false to use modules.")
-  endif()
-endif()
+  endif ()
+endif ()
 
 
 # Adds a library compiled with C++20 module support.
