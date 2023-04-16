@@ -43,6 +43,29 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif ()
 
 
+
+# Receives latest available C++ standard version
+#
+# Usage:
+#   modules_get_latest_cxx_std(<variable_name>)
+#   if(<variable_name> GREATER 17)
+#      ...
+#   endif()
+function(modules_get_latest_cxx_std result)
+  # assume that 98 will be supported even with a broken feature detection
+  set(std_version 98)
+
+  # iterate over features and use the latest one (CMake always sorts features from the oldest to the newest)
+  foreach(compiler_feature ${CMAKE_CXX_COMPILE_FEATURES})
+    if(compiler_feature MATCHES "cxx_std_(.*)")
+      set(std_version ${CMAKE_MATCH_1})
+    endif()
+  endforeach()
+
+  set(${result} ${std_version} PARENT_SCOPE)
+endfunction()
+
+
 # Adds a library compiled with C++20 module support.
 # `enabled` is a CMake variables that specifies if modules are enabled.
 # If modules are disabled `add_module_library` falls back to creating a
