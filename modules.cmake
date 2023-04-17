@@ -115,21 +115,19 @@ function(add_module_library name)
     endforeach ()
   endif ()
 
-  # Common: add sources
   target_sources(${name} PRIVATE ${sources})
 
-  # MSVC
   if (MSVC)
     foreach (src ${sources})
-      # compile file as interface
+      # Compile file as a module interface.
       set_source_files_properties(${src} PROPERTIES COMPILE_FLAGS /interface)
 
-      # set .ifc file as reference for dependant project
+      # Propagate `/reference *.ifc` to targets that link with this library.
       get_filename_component(ifc ${src} NAME_WE)
       set(ifc "${CMAKE_CURRENT_BINARY_DIR}/${ifc}.ifc")
       target_compile_options(${name} INTERFACE /reference "${ifc}")
 
-      # track generated .ifc file
+      # Track the generated .ifc file.
       set_target_properties(${name} PROPERTIES ADDITIONAL_CLEAN_FILES ${ifc})
       set_source_files_properties(${ifc} PROPERTIES GENERATED ON)
     endforeach()
