@@ -89,6 +89,8 @@ function(modules_supported result)
     set(compiler_flags "")
     if (MSVC)
       set(compiler_flags "/interface")
+    elseif (CMAKE_COMPILER_IS_GNUCXX)
+      set(compiler_flags "-fmodules-ts")
     endif ()
 
     # Try to build it.
