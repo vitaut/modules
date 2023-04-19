@@ -12,16 +12,14 @@ jobs:
       matrix:
         # https://github.com/actions/virtual-environments.
         os: [ubuntu-22.04]
-        compiler: ["g++-12", "g++-13", "clang++-14", "clang++-15", "clang++-16"]
+        cxx: ["g++-11", "g++-12", "clang++-15", "clang++-16"]
         standard: [20, 23]
         build_type: [Debug]
         include:
+          - cxx: g++-11
+            install: sudo apt install g++-11
           - cxx: g++-12
             install: sudo apt install g++-12
-          - cxx: g++-13
-            install: sudo apt install g++-13
-          - cxx: clang++-14
-            install: sudo apt install clang-14
           - cxx: clang++-15
             source: "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"
             install: sudo apt install clang-15
