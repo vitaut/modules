@@ -1,8 +1,16 @@
 # Simple C++20 module support for CMake
 
 [![](https://github.com/vitaut/modules/workflows/linux/badge.svg)](https://github.com/vitaut/modules/actions?query=workflow%3Alinux)
+[![](https://github.com/vitaut/modules/workflows/windows/badge.svg)](https://github.com/vitaut/modules/actions?query=workflow%3Awindows)
 
-Provides the `add_module_library` CMake function that is a wrapper around `add_library` with additional module-specific rules. Currently supports clang 15+ and gcc 12+ and can fallback to a non-modular library for compatibility.
+Provides the `add_module_library` CMake function that is a wrapper around `add_library` with additional module-specific rules. 
+
+This module currently supports:
+* Clang 15+ 
+* GCC 11+
+* MSVC 19.28+
+
+This module can also fallback to a non-modular library for compatibility.
 
 Projects using `add_module_library`:
 
