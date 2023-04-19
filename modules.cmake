@@ -66,6 +66,50 @@ function(modules_get_latest_cxx_std result)
 endfunction()
 
 
+# Checks that compiler has support for C++ modules feature
+#
+# Usage:
+#   modules_is_supported(<variable_name>)
+#   if(<variable_name>)
+#      ...
+#   endif()
+function(modules_supported result)
+  set(${result} FALSE PARENT_SCOPE)
+
+  # check standard version
+  modules_get_latest_cxx_std(latest_standard)
+  if(latest_standard GREATER_EQUAL 20)
+
+    # create simple module file
+    set(temp_filepath "${CMAKE_BINARY_DIR}/module_test.cc")
+    file(WRITE "${temp_filepath}" "module;\nexport module module_test;\nexport void module_test_fun(){}")
+
+    # set needed compiler flags
+    set(compiler_flags "")
+    if (MSVC)
+      set(compiler_flags "/interface")
+    endif()
+
+    # try to build it
+    set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+    try_compile(
+      compilation_result "${CMAKE_BINARY_DIR}"
+      SOURCES "${temp_filepath}"
+      COMPILE_DEFINITIONS "${compiler_flags}"
+      CXX_STANDARD ${latest_standard}
+      CXX_STANDARD_REQUIRED ON
+      OUTPUT_VARIABLE output
+    )
+
+    # remove test file
+    file(REMOVE ${temp_filepath})
+
+    # return result
+    set(${result} ${compilation_result} PARENT_SCOPE)
+  endif()
+endfunction()
+
+
 # Adds a library compiled with C++20 module support.
 # `enabled` is a CMake variables that specifies if modules are enabled.
 # If modules are disabled `add_module_library` falls back to creating a
