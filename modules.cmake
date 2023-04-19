@@ -124,8 +124,13 @@ function(add_module_library name)
   add_library(${name})
   set_target_properties(${name} PROPERTIES LINKER_LANGUAGE CXX)
 
-  if (NOT ${${AML_IF}})
-    # Create a non-modular library.
+  # Detect module support in case it was not explicitly defined
+  if(NOT DEFINED AML_IF)
+    modules_supported(AML_IF)
+  endif()
+
+  # Add fallback sources to the target in case modules are not supported or fallback was explicitly selected
+  if (NOT ${AML_IF})
     target_sources(${name} PRIVATE ${AML_FALLBACK})
     return()
   endif ()
