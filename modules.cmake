@@ -38,59 +38,60 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   if (NOT DEFINED CMAKE_CXX_EXTENSIONS)
     set(CMAKE_CXX_EXTENSIONS OFF)
   elseif (NOT CMAKE_CXX_EXTENSIONS)
-    message(WARNING "Clang requires CMAKE_CXX_EXTENSIONS to be set to false to use modules.")
+    message(
+      WARNING
+      "Clang requires CMAKE_CXX_EXTENSIONS to be set to false to use modules.")
   endif ()
 endif ()
-
-
 
 # Receives latest available C++ standard version
 #
 # Usage:
 #   modules_get_latest_cxx_std(<variable_name>)
-#   if(<variable_name> GREATER 17)
-#      ...
-#   endif()
+#   if (<variable_name> GREATER 17)
+#     ...
+#   endif ()
 function(modules_get_latest_cxx_std result)
-  # assume that 98 will be supported even with a broken feature detection
+  # Assume that 98 will be supported even with a broken feature detection.
   set(std_version 98)
 
-  # iterate over features and use the latest one (CMake always sorts features from the oldest to the newest)
-  foreach(compiler_feature ${CMAKE_CXX_COMPILE_FEATURES})
-    if(compiler_feature MATCHES "cxx_std_(.*)")
+  # Iterate over features and use the latest one. CMake always sorts features
+  # from the oldest to the newest.
+  foreach (compiler_feature ${CMAKE_CXX_COMPILE_FEATURES})
+    if (compiler_feature MATCHES "cxx_std_(.*)")
       set(std_version ${CMAKE_MATCH_1})
-    endif()
-  endforeach()
+    endif ()
+  endforeach ()
 
   set(${result} ${std_version} PARENT_SCOPE)
 endfunction()
 
-
-# Checks that compiler has support for C++ modules feature
+# Checks that the compiler supports C++20 modules.
 #
 # Usage:
-#   modules_is_supported(<variable_name>)
-#   if(<variable_name>)
-#      ...
-#   endif()
+#   modules_supported(<variable_name>)
+#   if (<variable_name>)
+#     ...
+#   endif ()
 function(modules_supported result)
   set(${result} FALSE PARENT_SCOPE)
 
-  # check standard version
+  # Check the standard version.
   modules_get_latest_cxx_std(latest_standard)
   if(latest_standard GREATER_EQUAL 20)
 
-    # create simple module file
+    # Create a simple module file.
     set(temp_filepath "${CMAKE_BINARY_DIR}/module_test.cc")
-    file(WRITE "${temp_filepath}" "module;\nexport module module_test;\nexport void module_test_fun(){}")
+    file(WRITE "${temp_filepath}"
+         "module;\nexport module module_test;\nexport void module_test_fun(){}")
 
-    # set needed compiler flags
+    # Set compiler flags.
     set(compiler_flags "")
     if (MSVC)
       set(compiler_flags "/interface")
-    endif()
+    endif ()
 
-    # try to build it
+    # Try to build it.
     set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
     try_compile(
       compilation_result "${CMAKE_BINARY_DIR}"
@@ -98,15 +99,14 @@ function(modules_supported result)
       COMPILE_DEFINITIONS "${compiler_flags}"
       CXX_STANDARD ${latest_standard}
       CXX_STANDARD_REQUIRED ON
-      OUTPUT_VARIABLE output
-    )
+      OUTPUT_VARIABLE output)
 
-    # remove test file
+    # Remove the test file.
     file(REMOVE ${temp_filepath})
 
-    # return result
+    # Return the result.
     set(${result} ${compilation_result} PARENT_SCOPE)
-  endif()
+  endif ()
 endfunction()
 
 
@@ -129,7 +129,8 @@ function(add_module_library name)
     modules_supported(AML_IF)
   endif()
 
-  # Add fallback sources to the target in case modules are not supported or fallback was explicitly selected
+  # Add fallback sources to the target in case modules are not supported or
+  # fallback was explicitly selected.
   if (NOT ${AML_IF})
     target_sources(${name} PRIVATE ${AML_FALLBACK})
     return()
@@ -202,6 +203,6 @@ function(add_module_library name)
       # Track the generated .ifc file.
       set_target_properties(${name} PROPERTIES ADDITIONAL_CLEAN_FILES ${ifc})
       set_source_files_properties(${ifc} PROPERTIES GENERATED ON)
-    endforeach()
-  endif()
+    endforeach ()
+  endif ()
 endfunction()
