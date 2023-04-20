@@ -164,12 +164,13 @@ function(add_module_library name)
       # Use an absolute path to prevent target_link_libraries prepending -l
       # to it.
       set(pcms ${pcms} ${CMAKE_CURRENT_BINARY_DIR}/${pcm})
+      set(prop "$<TARGET_PROPERTY:${name},INCLUDE_DIRECTORIES>")
       add_custom_command(
         OUTPUT ${pcm}
         COMMAND ${CMAKE_CXX_COMPILER}
                 -std=c++${std} -x c++-module --precompile -c
                 -o ${pcm} ${CMAKE_CURRENT_SOURCE_DIR}/${src}
-                "-I$<JOIN:$<TARGET_PROPERTY:${name},INCLUDE_DIRECTORIES>,;-I>"
+                "$<$<BOOL:${prop}>:-I$<JOIN:${prop},;-I>>"
         # Required by the -I generator expression above.
         COMMAND_EXPAND_LISTS
         DEPENDS ${src})
