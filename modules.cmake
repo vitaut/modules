@@ -192,6 +192,15 @@ function(add_module_library name)
 
   target_sources(${name} PRIVATE ${sources})
 
+  if (CMAKE_COMPILER_IS_GNUCXX)
+    # treat modules files as c++
+    foreach (src ${sources})
+      if (src MATCHES "\\.(ccm|cxxm|c\\+\\+m|cppm)$")
+        set_source_files_properties(${src} PROPERTIES COMPILE_FLAGS "-x c++")
+      endif ()
+    endforeach ()
+  endif ()
+
   if (MSVC)
     foreach (src ${sources})
       # Compile file as a module interface.
