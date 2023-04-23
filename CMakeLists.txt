@@ -7,9 +7,12 @@ include(modules.cmake)
 # Display debug info
 modules_get_latest_cxx_std(std_latest_ver)
 modules_supported(cxx_modules)
-message(STATUS "C++ standard targeted  = ${CMAKE_CXX_STANDARD}")
-message(STATUS "C++ standard supported = ${std_latest_ver}")
-message(STATUS "C++ modules supported  = ${cxx_modules}")
+modules_supported(cxx_modules_latest STANDARD ${std_latest_ver})
+message(STATUS "C++ target standard  = ${CMAKE_CXX_STANDARD}")
+message(STATUS "    modules support  = ${cxx_modules}")
+message(STATUS "")
+message(STATUS "C++ latest standard  = ${std_latest_ver}")
+message(STATUS "    modules support  = ${cxx_modules_latest}")
 
 # Module library
 add_module_library(hello hello.cc)
