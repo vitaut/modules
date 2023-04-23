@@ -69,16 +69,25 @@ endfunction()
 # Checks that the compiler supports C++20 modules.
 #
 # Usage:
-#   modules_supported(<variable_name>)
+#   modules_supported(<variable_name> [STANDARD standard_ver])
 #   if (<variable_name>)
 #     ...
 #   endif ()
 function(modules_supported result)
+  cmake_parse_arguments(MS "" "STANDARD" "" ${ARGN})
+
   set(${result} FALSE PARENT_SCOPE)
 
   # Check the standard version.
-  modules_get_latest_cxx_std(latest_standard)
-  if(latest_standard GREATER_EQUAL 20)
+  if (NOT DEFINED MS_STANDARD)
+    if (DEFINED CMAKE_CXX_STANDARD)
+      set(MS_STANDARD ${CMAKE_CXX_STANDARD})
+    else ()
+      modules_get_latest_cxx_std(MS_STANDARD)
+    endif ()
+  endif ()
+
+  if (MS_STANDARD GREATER_EQUAL 20)
 
     # Create a simple module file.
     set(temp_filepath "${CMAKE_BINARY_DIR}/module_test.cc")
@@ -99,7 +108,7 @@ function(modules_supported result)
       compilation_result "${CMAKE_BINARY_DIR}"
       SOURCES "${temp_filepath}"
       COMPILE_DEFINITIONS "${compiler_flags}"
-      CXX_STANDARD ${latest_standard}
+      CXX_STANDARD ${MS_STANDARD}
       CXX_STANDARD_REQUIRED ON
       OUTPUT_VARIABLE output)
 
