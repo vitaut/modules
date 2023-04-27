@@ -1,2 +1,3 @@
-import hello;
+#include "hello.h"
+
 int main() { hello(); }
