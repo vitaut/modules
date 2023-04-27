@@ -14,7 +14,7 @@ jobs:
         os: [windows-2022]
         platform: [x64]
         toolset: [v142]
-        standard: [20, 23]
+        standard: [17, 20, 23]
         build_type: [Debug]
 
     steps:
@@ -30,3 +30,8 @@ jobs:
     - name: Build
       working-directory: ${{runner.workspace}}/build
       run: cmake --build . --config ${{matrix.build_type}} --parallel
+
+    - name: Test
+      env:
+        CHECK_STRING: ${{fromJSON('["Modules are late to the party", "Hello, modules"]')[matrix.standard > 17]}}
+      run: $(${{runner.workspace}}/build/${{matrix.build_type}}/main.exe | Out-String) -match "${env:CHECK_STRING}"
