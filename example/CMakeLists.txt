@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.11)
 project(HELLO CXX)
 
 # Include module library
-include(modules.cmake)
+include(../modules.cmake)
 
 # Display debug info
 modules_get_latest_cxx_std(std_latest_ver)

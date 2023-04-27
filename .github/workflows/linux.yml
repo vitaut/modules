@@ -42,7 +42,7 @@ jobs:
       working-directory: ${{runner.workspace}}/build
       env:
         CXX: ${{matrix.cxx}}
-      run: cmake -DCMAKE_CXX_STANDARD=${{matrix.standard}} -DCMAKE_BUILD_TYPE=${{matrix.build_type}} ${GITHUB_WORKSPACE}
+      run: cmake -DCMAKE_CXX_STANDARD=${{matrix.standard}} -DCMAKE_BUILD_TYPE=${{matrix.build_type}} ${GITHUB_WORKSPACE}/example
 
     - name: Build
       working-directory: ${{runner.workspace}}/build
