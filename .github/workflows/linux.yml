@@ -13,7 +13,7 @@ jobs:
         # https://github.com/actions/virtual-environments.
         os: [ubuntu-22.04]
         cxx: ["g++-11", "g++-12", "clang++-15", "clang++-16"]
-        standard: [20, 23]
+        standard: [17, 20, 23]
         build_type: [Debug]
         include:
           - cxx: g++-11
@@ -47,3 +47,8 @@ jobs:
     - name: Build
       working-directory: ${{runner.workspace}}/build
       run: cmake --build . --config ${{matrix.build_type}} --parallel
+
+    - name: Test
+      env:
+        CHECK_STRING: ${{fromJSON('["Modules are late to the party :(", "Hello, modules!"]')[matrix.standard > 17]}}
+      run: ${{runner.workspace}}/build/main | grep "$CHECK_STRING"
