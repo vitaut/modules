@@ -1,6 +1,6 @@
 module;
 
-#include <cstdio>
+import <cstdio>;
 
 export module hello;
 
