@@ -57,8 +57,25 @@ endif ()
 #     ...
 #   endif ()
 
+function(modules_get_latest_cxx_std result)
+  # Assume that 98 will be supported even with a broken feature detection.
+  set(std_version 98)
+
+  # Iterate over features and use the latest one. CMake always sorts features
+  # from the oldest to the newest.
+  foreach (compiler_feature ${CMAKE_CXX_COMPILE_FEATURES})
+    if (compiler_feature MATCHES "cxx_std_(.*)")
+      set(std_version ${CMAKE_MATCH_1})
+    endif ()
+  endforeach ()
+
+  set(${result} ${std_version} PARENT_SCOPE)
+endfunction()
+
+
 # wth regex checks if we used import syntax importing standard headers as modules and sets a var if gets any with a list of standard headers 
-function(check_no_import_stdlib result) 
+function(check_no_import_stdheaders result) 
+	modules_get_latest_cxx_std(std_version)
 	set(stdlib_list iostream string vector) # add the entire list of standard headers?
 	cmake_parse_arguments(MOD "" "IF" "Else" ${ARGN})
 	set(files ${MOD_UNPARSED_ARGUMENTS})
@@ -94,8 +111,13 @@ endfunction()
 function(add_stdheader_gcm)
 	cmake_parse_arguments(MOD "" "IF" "Else" ${ARGN})
 	set(source ${MOD_UNPARSED_ARGUMENTS})
-	check_no_import_stdlib(has_stdimport ${source})
+	check_no_import_stdheaders(has_stdimport ${source})
+	string(REGEX REPLACE "[^0-9]" ";"  TMP ${CMAKE_CXX_COMPILER_VERSION})
+	list(GET TMP 0 CXX_COMPILER_VERSION_MAJOR)
 	set(STD_HEADERS_BUILT FALSE PARENT_SCOPE)
+	if(has_stdimport AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" AND ${CXX_COMPILER_VERSION_MAJOR} LESS 12)
+		message(WARNING "Compiler(${CMAKE_CXX_COMPILER_ID}) version seems to be ${CXX_COMPILER_VERSION_MAJOR}, you seem to have std imports\nC++23 features won't work")
+	endif()
 	set(CMAKE_CXX_EXTENSIONS OFF PARENT_SCOPE)
 	list(LENGTH std_modules len_std_modules)	
 	if(len_std_modules GREATER 0)
@@ -128,21 +150,6 @@ function(add_stdmodular_executable name)
 	target_compile_options(main PUBLIC -std=c++20 -fcoroutines -fmodules-ts)
 endfunction()
 
-
-function(modules_get_latest_cxx_std result)
-  # Assume that 98 will be supported even with a broken feature detection.
-  set(std_version 98)
-
-  # Iterate over features and use the latest one. CMake always sorts features
-  # from the oldest to the newest.
-  foreach (compiler_feature ${CMAKE_CXX_COMPILE_FEATURES})
-    if (compiler_feature MATCHES "cxx_std_(.*)")
-      set(std_version ${CMAKE_MATCH_1})
-    endif ()
-  endforeach ()
-
-  set(${result} ${std_version} PARENT_SCOPE)
-endfunction()
 
 # Checks that the compiler supports C++20 modules.
 #
