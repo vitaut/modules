@@ -150,7 +150,7 @@ function(add_stdmodular_executable name)
 	target_compile_features(${name} PUBLIC cxx_std_20)
 	target_compile_options(${name} PUBLIC -std=c++20 -fcoroutines -fmodules-ts)
 	# add dependencies so the gcms are built before getting to the main targets(?)
-	if(${STD_HEADERS_BUILT})
+	if(STD_HEADERS_BUILT)
 		foreach(module ${STD_MODULES})
 			add_dependencies(${name} ${module})
 		endforeach()
@@ -227,12 +227,16 @@ function(add_module_library name)
 	  message(FATAL_ERROR "Sorry! Clang is not supported yet")
   endif()
 
-  if(NOT STD_HEADERS_BUILT)
-	add_stdheader_gcm(${sources})	
-  endif()
+  add_stdheader_gcm(${sources})	
 
   add_library(${name})
   set_target_properties(${name} PROPERTIES LINKER_LANGUAGE CXX)
+  if(STD_HEADERS_BUILT)
+		foreach(module ${STD_MODULES})
+			add_dependencies(${name} ${module})
+		endforeach()
+  endif()
+
 
   # Detect module support in case it was not explicitly defined
   if(NOT DEFINED AML_IF)
