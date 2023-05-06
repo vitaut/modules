@@ -12,6 +12,7 @@ jobs:
       matrix:
         # https://github.com/actions/virtual-environments.
         os: [ubuntu-22.04]
+        generator: ["Ninja", "Unix Makefiles"]
         cxx: ["g++-11", "g++-12", "clang++-15", "clang++-16"]
         standard: [17, 20, 23]
         build_type: [Debug]
@@ -26,6 +27,12 @@ jobs:
           - cxx: clang++-16
             source: "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-16 main"
             install: sudo apt install clang-16
+        # BUG: Ninja + GCC + Modules fails to build
+        exclude:
+          - {generator: "Ninja", cxx: "g++-11", standard: 20 }
+          - {generator: "Ninja", cxx: "g++-11", standard: 23 }
+          - {generator: "Ninja", cxx: "g++-12", standard: 20 }
+          - {generator: "Ninja", cxx: "g++-12", standard: 23 }
 
     steps:
     - uses: actions/checkout@v3
@@ -35,6 +42,7 @@ jobs:
         sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 15CF4D18AF4F7421 #LLVM repo key
         echo '${{matrix.source}}' | sudo tee /etc/apt/sources.list.d/github.list
         sudo apt update
+        sudo apt install ninja-build
         ${{matrix.install}}
         cmake -E make_directory ${{runner.workspace}}/build
 
@@ -42,7 +50,7 @@ jobs:
       working-directory: ${{runner.workspace}}/build
       env:
         CXX: ${{matrix.cxx}}
-      run: cmake -DCMAKE_CXX_STANDARD=${{matrix.standard}} -DCMAKE_BUILD_TYPE=${{matrix.build_type}} ${GITHUB_WORKSPACE}/example
+      run: cmake -G "${{matrix.generator}}" -DCMAKE_CXX_STANDARD=${{matrix.standard}} -DCMAKE_BUILD_TYPE=${{matrix.build_type}} ${GITHUB_WORKSPACE}/example
 
     - name: Build
       working-directory: ${{runner.workspace}}/build
