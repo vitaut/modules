@@ -32,6 +32,5 @@ jobs:
       run: cmake --build . --config ${{matrix.build_type}} --parallel
 
     - name: Test
-      env:
-        CHECK_STRING: ${{fromJSON('["Modules are late to the party", "Hello, modules"]')[matrix.standard > 17]}}
-      run: $(${{runner.workspace}}/build/${{matrix.build_type}}/main.exe | Out-String) -match "${env:CHECK_STRING}"
+      working-directory: ${{runner.workspace}}/build/${{matrix.build_type}}
+      run: cmake -DCMAKE_CXX_STANDARD=${{matrix.standard}} -P "${env:GITHUB_WORKSPACE}/.github/workflows/test_helloworld.cmake"
