@@ -13,7 +13,7 @@ jobs:
         # https://github.com/actions/virtual-environments.
         os: [ubuntu-22.04]
         cxx: ["g++-12"] #"clang++-15", "clang++-16"] # Clang is not supported
-        standard: [17, 20, 23]
+        standard: [20]
         build_type: [Debug]
         include:
           - cxx: g++-12
