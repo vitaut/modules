@@ -12,12 +12,10 @@ jobs:
       matrix:
         # https://github.com/actions/virtual-environments.
         os: [ubuntu-22.04]
-        cxx: ["g++-11", "g++-12"] #"clang++-15", "clang++-16"] # Clang is not supported
+        cxx: ["g++-12"] #"clang++-15", "clang++-16"] # Clang is not supported
         standard: [17, 20, 23]
         build_type: [Debug]
         include:
-          - cxx: g++-11
-            install: sudo apt install g++-11
           - cxx: g++-12
             install: sudo apt install g++-12
             #- cxx: clang++-15
