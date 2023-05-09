@@ -12,7 +12,7 @@ jobs:
       matrix:
         # https://github.com/actions/virtual-environments.
         os: [ubuntu-22.04]
-        cxx: ["g++-11", "g++-12", "clang++-15", "clang++-16"]
+        cxx: ["g++-11", "g++-12"] #"clang++-15", "clang++-16"] # Clang is not supported
         standard: [17, 20, 23]
         build_type: [Debug]
         include:
@@ -20,12 +20,12 @@ jobs:
             install: sudo apt install g++-11
           - cxx: g++-12
             install: sudo apt install g++-12
-          - cxx: clang++-15
-            source: "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"
-            install: sudo apt install clang-15
-          - cxx: clang++-16
-            source: "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-16 main"
-            install: sudo apt install clang-16
+            #- cxx: clang++-15
+            #  source: "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"
+            #  install: sudo apt install clang-15
+            #- cxx: clang++-16
+            #  source: "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-16 main"
+            #  install: sudo apt install clang-16
 
     steps:
     - uses: actions/checkout@v3

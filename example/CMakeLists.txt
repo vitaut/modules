@@ -15,14 +15,14 @@ message(STATUS "C++ latest standard  = ${std_latest_ver}")
 message(STATUS "    modules support  = ${cxx_modules_latest}")
 
 # Module library
-add_module_library(hello hello.cc FALLBACK hello_fallback.cc)
+add_module_library(hello hello.cc FALLBACK hello_fallback.cc CATCH_ERRORS FALSE)
 target_include_directories(hello PUBLIC include)
 
-# Demo application
+## Demo application
 if(cxx_modules)
   set(app_src main.cc)
 else()
   set(app_src main_fallback.cc)
 endif()
-add_stdmodular_executable(main ${app_src})
+add_module_executable(main ${app_src} CATCH_ERRORS TRUE)
 target_link_libraries(main hello)
