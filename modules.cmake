@@ -127,9 +127,11 @@ endfunction()
 # non-modular library.
 #
 # Usage:
-#   add_module_library(<name> [sources...] FALLBACK [sources...] [IF enabled])
+# GH: ADDED PTHREAD TO THE HELP LINE
+#   add_module_library(<name> [sources...] FALLBACK [sources...] [IF enabled] PTHREAD)
 function(add_module_library name)
-  cmake_parse_arguments(AML "" "IF" "FALLBACK" ${ARGN})
+# GH: ADDED PTHREAD TO THE <options> ITEM
+  cmake_parse_arguments(AML "PTHREAD" "IF" "FALLBACK" ${ARGN})
   set(sources ${AML_UNPARSED_ARGUMENTS})
 
   add_library(${name})
@@ -146,6 +148,16 @@ function(add_module_library name)
     target_sources(${name} PRIVATE ${AML_FALLBACK})
     return()
   endif ()
+
+# GH: CODE ADDED FROM HERE TO GH: END OF CODE SECTION
+  if(AML_PTHREAD STREQUAL TRUE)
+    if(NOT MSVC)
+      set(PTHREAD_FLAG -pthread)
+    endif()
+  else()
+      set(PTHREAD_FLAG "")
+  endif()
+# GH: END OF CODE SECTION
 
   # Modules require C++20.
   target_compile_features(${name} PUBLIC cxx_std_20)
@@ -177,6 +189,8 @@ function(add_module_library name)
       add_custom_command(
         OUTPUT ${pcm}
         COMMAND ${CMAKE_CXX_COMPILER}
+# GH: ADDED FOLLOWING LINE
+                ${PTHREAD_FLAG}
                 -std=c++${std} -x c++-module --precompile -c
                 -o ${pcm} ${CMAKE_CURRENT_SOURCE_DIR}/${src}
                 "$<$<BOOL:${prop}>:-I$<JOIN:${prop},;-I>>"
