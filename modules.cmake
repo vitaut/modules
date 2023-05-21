@@ -196,6 +196,8 @@ function(add_module_library name)
         OUTPUT ${obj}
         COMMAND ${CMAKE_CXX_COMPILER} $<TARGET_PROPERTY:${name},COMPILE_OPTIONS>
                 -c -o ${obj} ${pcm}
+        # Required by the generator expression above.
+        COMMAND_EXPAND_LISTS
         DEPENDS ${pcm})
     endforeach ()
   endif ()
