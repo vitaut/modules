@@ -168,7 +168,7 @@ function(add_module_library name)
 
       # Propagate -fmodule-file=*.pcm to targets that link with this library.
       target_compile_options(
-        ${name} PUBLIC -fmodule-file=${CMAKE_CURRENT_BINARY_DIR}/${pcm})
+        ${name} INTERFACE -fmodule-file=${CMAKE_CURRENT_BINARY_DIR}/${pcm})
 
       # Use an absolute path to prevent target_link_libraries prepending -l
       # to it.
@@ -179,6 +179,7 @@ function(add_module_library name)
         COMMAND ${CMAKE_CXX_COMPILER}
                 -std=c++${std} -x c++-module --precompile -c
                 -o ${pcm} ${CMAKE_CURRENT_SOURCE_DIR}/${src}
+                $<TARGET_PROPERTY:${name},COMPILE_OPTIONS>
                 "$<$<BOOL:${prop}>:-I$<JOIN:${prop},;-I>>"
         # Required by the -I generator expression above.
         COMMAND_EXPAND_LISTS
