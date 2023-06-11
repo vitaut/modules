@@ -62,3 +62,10 @@ Running:
 $ ./main
 Hello, modules!
 ```
+
+## License
+
+The code is distributed under the permissive `MIT license
+<https://github.com/vitaut/modules/blob/d7d015ae07681b0c003e8c8feffac08c8b3e9dd3/modules.cmake#L6-L30>`_
+with an optional exception that allows distributing binary code without
+attribution.
