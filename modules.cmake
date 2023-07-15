@@ -37,7 +37,7 @@
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   if (NOT DEFINED CMAKE_CXX_EXTENSIONS)
     set(CMAKE_CXX_EXTENSIONS OFF)
-  elseif (CMAKE_CXX_EXTENSIONS)
+  elseif (NOT CMAKE_CXX_EXTENSIONS)
     message(
       WARNING
       "Clang requires CMAKE_CXX_EXTENSIONS to be set to false to use modules.")
@@ -131,24 +131,28 @@ endfunction()
 function(add_module_library)
   cmake_parse_arguments(
         ADD_MODULE_LIBRARY # prefix of output variables
-        "FALLBACK" # list of names of the boolean arguments (only defined ones will be true)
-        "NAME;MAPPER_FILE" # list of names of mono-valued arguments
+        "" # list of names of the boolean arguments (only defined ones will be true)
+        "FALLBACK;NAME;MAPPER_FILE" # list of names of mono-valued arguments
         "SOURCES;SOURCES_FALLBACK" # list of names of multi-valued arguments (output variables are lists)
         ${ARGN} # arguments of the function to parse, here we take the all original ones
     )
 
   set(name ${ADD_MODULE_LIBRARY_NAME})
   set(mapper_file ${ADD_MODULE_LIBRARY_MAPPER_FILE})
-  set(FALLBACK ${ADD_MODULE_LIBRARY_FALLBACK})
-  set(fallback_sources ${ADD_MODULE_LIBRARY_FALLBACK_SOURCES})
+  set(fallback_sources ${ADD_MODULE_LIBRARY_SOURCES_FALLBACK})
   set(sources ${ADD_MODULE_LIBRARY_SOURCES})
 
   add_library(${name})
   set_target_properties(${name} PROPERTIES LINKER_LANGUAGE CXX)
 
+  # Detect module support in case it was not explicitly defined
+  if(NOT DEFINED ADD_MODULE_LIBRARY_FALLBACK)
+    modules_supported(ADD_MODULE_LIBRARY_FALLBACK)
+  endif()
+
   # Add fallback sources to the target in case modules are not supported or
   # fallback was explicitly selected.
-  if (FALLBACK)
+  if (NOT ${ADD_MODULE_LIBRARY_FALLBACK})
     target_sources(${name} PRIVATE ${fallback_sources})
     return()
   endif ()
