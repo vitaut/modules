@@ -241,7 +241,7 @@ function(add_module_library name)
       COMMAND_EXPAND_LISTS
       DEPENDS ${gcms})
 
-    SET_SOURCE_FILES_PROPERTIES(
+    set_source_files_properties(
       ${sources} PROPERTIES OBJECT_DEPENDS ${mapper_file})
   endif ()
 
