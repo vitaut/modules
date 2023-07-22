@@ -17,10 +17,7 @@ message(STATUS "    modules support  = ${cxx_modules_latest}")
 set(MAPPER_FILE ${CMAKE_BINARY_DIR}/mapper.txt)
 
 # Module library
-add_module_library(NAME hello
-  MAPPER_FILE ${MAPPER_FILE}
-  SOURCES ${CMAKE_CURRENT_LIST_DIR}/hello.cc
-  SOURCES_FALLBACK ${CMAKE_CURRENT_LIST_DIR/}hello_fallback.cc)
+add_module_library(hello hello.cc FALLBACK hello_fallback.cc MAPPER_FILE ${MAPPER_FILE})
 target_include_directories(hello PUBLIC include)
 
 # Demo application
@@ -31,8 +28,3 @@ else()
 endif()
 add_executable(main ${app_src})
 target_link_libraries(main hello)
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(main PUBLIC
-    -fmodule-mapper=${MAPPER_FILE})
-endif ()
