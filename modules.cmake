@@ -128,32 +128,23 @@ endfunction()
 #
 # Usage:
 #   add_module_library(<name> [sources...] FALLBACK [sources...] [IF enabled])
-function(add_module_library)
-  cmake_parse_arguments(
-        ADD_MODULE_LIBRARY # prefix of output variables
-        "" # list of names of the boolean arguments (only defined ones will be true)
-        "FALLBACK;NAME;MAPPER_FILE" # list of names of mono-valued arguments
-        "SOURCES;SOURCES_FALLBACK" # list of names of multi-valued arguments (output variables are lists)
-        ${ARGN} # arguments of the function to parse, here we take the all original ones
-    )
-
-  set(name ${ADD_MODULE_LIBRARY_NAME})
-  set(mapper_file ${ADD_MODULE_LIBRARY_MAPPER_FILE})
-  set(fallback_sources ${ADD_MODULE_LIBRARY_SOURCES_FALLBACK})
-  set(sources ${ADD_MODULE_LIBRARY_SOURCES})
+function(add_module_library name)
+  cmake_parse_arguments(AML "" "IF;MAPPER_FILE" "FALLBACK" ${ARGN})
+  set(sources ${AML_UNPARSED_ARGUMENTS})
+  set(mapper_file ${AML_MAPPER_FILE})
 
   add_library(${name})
   set_target_properties(${name} PROPERTIES LINKER_LANGUAGE CXX)
 
   # Detect module support in case it was not explicitly defined
-  if(NOT DEFINED ADD_MODULE_LIBRARY_FALLBACK)
-    modules_supported(ADD_MODULE_LIBRARY_FALLBACK)
+  if(NOT DEFINED AML_IF)
+    modules_supported(AML_IF)
   endif()
 
   # Add fallback sources to the target in case modules are not supported or
   # fallback was explicitly selected.
-  if (NOT ${ADD_MODULE_LIBRARY_FALLBACK})
-    target_sources(${name} PRIVATE ${fallback_sources})
+  if (NOT ${AML_IF})
+    target_sources(${name} PRIVATE ${AML_FALLBACK})
     return()
   endif ()
 
@@ -188,7 +179,7 @@ function(add_module_library)
         OUTPUT ${pcm}
         COMMAND ${CMAKE_CXX_COMPILER}
                 -std=c++${std} -x c++-module --precompile -c
-                -o ${pcm} ${src}
+                -o ${pcm} ${CMAKE_CURRENT_SOURCE_DIR}/${src}
                 $<TARGET_PROPERTY:${name},COMPILE_OPTIONS>
                 "$<$<BOOL:${prop}>:-I$<JOIN:${prop},;-I>>"
         # Required by the -I generator expression above.
@@ -217,6 +208,11 @@ function(add_module_library)
   if (CMAKE_COMPILER_IS_GNUCXX)
     get_target_property(std ${name} CXX_STANDARD)
 
+    # Propagate -fmodule-mapper=mapper_file to targets that link with this library.
+    target_compile_options(
+      ${name} INTERFACE -fmodule-mapper=${MAPPER_FILE})
+
+
     # Add .gcm/.o files as sources to make sure they are built before the library.
     set(sources_in ${sources})
     set(sources)
@@ -231,7 +227,7 @@ function(add_module_library)
         OUTPUT ${obj} ${gcm}
         COMMAND ${CMAKE_CXX_COMPILER} $<TARGET_PROPERTY:${name},COMPILE_OPTIONS>
         -std=c++${std} -fmodules-ts
-        -xc++ -c -o ${obj} ${src}
+        -xc++ -c -o ${obj} ${CMAKE_CURRENT_SOURCE_DIR}/${src}
         # Required by the generator expression above.
         COMMAND_EXPAND_LISTS
         DEPENDS ${src})
@@ -245,10 +241,8 @@ function(add_module_library)
       COMMAND_EXPAND_LISTS
       DEPENDS ${gcms})
 
-    # add dummy target to handle updates
-    add_custom_target(${name}_dummy__ DEPENDS
-      ${gcms} ${mapper_file})
-    add_dependencies(${name} ${name}_dummy__)
+    SET_SOURCE_FILES_PROPERTIES(
+      ${sources} PROPERTIES OBJECT_DEPENDS ${mapper_file})
   endif ()
 
   target_sources(${name} PRIVATE ${sources})

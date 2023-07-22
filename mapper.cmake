@@ -1,8 +1,15 @@
-write_file(${MAPPER_FILE} "") # TODO: merge all libs files
+if(NOT(EXISTS ${MAPPER_FILE}))
+  # create file if doesn't exist
+  write_file(${MAPPER_FILE} "") 
+endif()
 FILE(GLOB children RELATIVE ${CMAKE_CURRENT_BINARY_DIR}/gcm.cache/ ${CMAKE_CURRENT_BINARY_DIR}/gcm.cache/*)
 FOREACH(child ${children})
   IF(NOT (IS_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/gcm.cache/${child}))
+    # remove module from mapper file if exists, then append new module to mapper file
     get_filename_component(inc ${child} NAME_WE)
-    write_file(${MAPPER_FILE} ${inc} " " ${CMAKE_CURRENT_BINARY_DIR}/gcm.cache/${child} "\n" )
+    file(READ ${MAPPER_FILE} file_data)
+    string(REGEX REPLACE "[ \t]*${inc}[ \t]+[^\n]+\n" "" file_data ${file_data})
+    set(file_data "${file_data}\n${inc} ${CMAKE_CURRENT_BINARY_DIR}/gcm.cache/${child}\n")
+    file(WRITE ${MAPPER_FILE} "${file_data}")
   ENDIF()
 ENDFOREACH()
