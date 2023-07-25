@@ -37,7 +37,7 @@
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   if (NOT DEFINED CMAKE_CXX_EXTENSIONS)
     set(CMAKE_CXX_EXTENSIONS OFF)
-  elseif (NOT CMAKE_CXX_EXTENSIONS)
+  elseif (CMAKE_CXX_EXTENSIONS)
     message(
       WARNING
       "Clang requires CMAKE_CXX_EXTENSIONS to be set to false to use modules.")
