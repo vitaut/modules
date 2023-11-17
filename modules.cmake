@@ -153,7 +153,7 @@ function(add_module_library name)
     target_compile_options(${name} PUBLIC -fmodules-ts)
   endif ()
 
-  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_VERSION VERSION_LESS 3.28)
     # `std` is affected by CMake options and may be higher than C++20.
     # Clang does not support c++23/c++26 names, so replace it with 2b.
     get_target_property(std ${name} CXX_STANDARD)
@@ -203,9 +203,13 @@ function(add_module_library name)
     endforeach ()
   endif ()
 
-  target_sources(${name} PRIVATE ${sources})
+  if(CMAKE_VERSION VERSION_LESS 3.28)
+    target_sources(${name} PRIVATE ${sources})
+  else()
+    target_sources(${name} PUBLIC FILE_SET fmt_module TYPE CXX_MODULES FILES ${sources})
+  endif()
 
-  if (MSVC)
+  if (MSVC AND CMAKE_VERSION VERSION_LESS 3.28)
     foreach (src ${sources})
       # Compile file as a module interface.
       set_source_files_properties(${src} PROPERTIES COMPILE_FLAGS /interface)
